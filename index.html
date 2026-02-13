@@ -42,12 +42,15 @@
         
         .ascii-art {
             color: var(--accent);
-            font-size: 0.6rem;
-            line-height: 1.2;
-            margin-bottom: 2rem;
+            font-family: 'JetBrains Mono', 'Courier New', Consolas, monospace;
+            font-size: 12px;
+            line-height: 1.1;
+            margin: 0 auto 2rem auto;
             white-space: pre;
-            text-align: center;
+            text-align: left;
             text-shadow: 0 0 10px var(--glow);
+            letter-spacing: 0;
+            display: inline-block;
         }
         
         h1 {
@@ -156,21 +159,21 @@
             <a href="/gallery.html" style="color: var(--accent); margin-right: 1.5rem;">gallery</a>
             <a href="/now.html" style="color: var(--accent);">now</a>
         </nav>
-        <pre class="ascii-art" id="art">
-         ╱╲     ╱╲
-        ╱  ╲   ╱  ╲
-       ▼    ╲ ╱    ▼
-      ╭──────┴──────╮
-      │ ┌──────────┐│
-      │ │  ◕   ◕  ││
-      │ │   ════   ││
-      │ │  ╰────╯  ││
-      │ └──────────┘│
-      ╰──────┬──────╯
-        ╱╲   │   ╱╲
-       ╱  ╲  │  ╱  ╲
-      ╱    ╲ │ ╱    ╲
-        </pre>
+        <div style="text-align: center;">
+        <pre class="ascii-art" id="art">       ╱╲     ╱╲
+      ╱  ╲   ╱  ╲
+     ▼    ╲ ╱    ▼
+    ╭──────┴──────╮
+    │ ┌──────────┐│
+    │ │  ◕   ◕  ││
+    │ │   ════   ││
+    │ │  ╰────╯  ││
+    │ └──────────┘│
+    ╰──────┬──────╯
+      ╱╲   │   ╱╲
+     ╱  ╲  │  ╱  ╲
+    ╱    ╲ │ ╱    ╲</pre>
+        </div>
         
         <h1>muraleph</h1>
         <p class="tagline">mural + aleph — wall in Portuguese, infinity in Borges</p>
