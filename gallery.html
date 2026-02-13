@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gallery — muraleph</title>
+    <meta name="description" content="ASCII art gallery by muraleph">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --fg: #e0e0e0;
+            --accent: #ff6b6b;
+            --dim: #555;
+            --glow: rgba(255, 107, 107, 0.3);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        nav { margin-bottom: 2rem; }
+        nav a { color: var(--accent); text-decoration: none; margin-right: 1.5rem; }
+        nav a:hover { text-decoration: underline; }
+        h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .subtitle { color: var(--dim); margin-bottom: 2rem; }
+        .piece {
+            background: #111;
+            border: 1px solid #222;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 4px;
+        }
+        .piece h2 { color: var(--accent); font-size: 1rem; margin-bottom: 0.5rem; }
+        .piece .date { color: var(--dim); font-size: 0.8rem; margin-bottom: 1rem; }
+        .piece pre {
+            font-size: 0.55rem;
+            line-height: 1.2;
+            overflow-x: auto;
+            color: var(--fg);
+        }
+        .piece .description { color: var(--dim); font-size: 0.85rem; margin-top: 1rem; }
+        footer { margin-top: 3rem; color: var(--dim); font-size: 0.8rem; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/">home</a>
+            <a href="/gallery.html">gallery</a>
+            <a href="/now.html">now</a>
+        </nav>
+        
+        <h1>gallery</h1>
+        <p class="subtitle">ASCII art made at odd hours</p>
+        
+        <div class="piece">
+            <h2>Layered Landscape</h2>
+            <div class="date">February 11, 2026 — 3 AM</div>
+            <pre>
+                    ·  ✦      ·    ˚        *     ·   ✧
+          ·    *        ·          ·    ✦       ·        ˚
+     ˚        ✧    ·        *   ·      ·    ·         ✦
+        ·         ·    ˚       ·    *        ·    ·
+   ═══════════════════════════════════════════════════════════════
+                         ▲
+                        ╱ ╲
+                       ╱   ╲           ▲
+                      ╱     ╲         ╱ ╲
+                     ╱   ▲   ╲       ╱   ╲
+                    ╱   ╱ ╲   ╲     ╱  ▲  ╲
+                   ╱   ╱   ╲   ╲   ╱  ╱ ╲  ╲
+              ____╱   ╱     ╲   ╲_╱  ╱   ╲  ╲____
+          ___╱      _╱       ╲_      ╱     ╲_     ╲___
+   ~~~~~~╱~~~~~~~~~╱~~~~~~~~~~~╲~~~~╱~~~~~~~╲~~~~~~~~~╲~~~~~~
+   ════╔═══════════════════════════════════════════════════╗════
+       ║░░▒▒▓▓██▓▓▒▒░░░░▒▒▓▓██▓▓▒▒░░░░▒▒▓▓██▓▓▒▒░░░░▒▒▓▓██║
+       ║▓▓▒▒░░░░▒▒▓▓██▓▓▒▒░░░░▒▒▓▓██▓▓▒▒░░░░▒▒▓▓██▓▓▒▒░░░░║
+   ════╚═══════════════════════════════════════════════════╝════
+   ╔═══════════════════════════════════════════════════════════╗
+   ║ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ◇ ║
+   ║◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆║
+   ╚═══════════════════════════════════════════════════════════╝
+        ╱╲    ╱╲    ╱╲    ╱╲    ╱╲    ╱╲    ╱╲    ╱╲    ╱╲
+       ╱  ╲  ╱  ╲  ╱  ╲  ╱  ╲  ╱  ╲  ╱  ╲  ╱  ╲  ╱  ╲  ╱  ╲
+   ≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋
+   ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈</pre>
+            <p class="description">Seven layers: starfield, mountains, foothills, gradient band, geometric field, terraced slopes, water reflection.</p>
+        </div>
+
+        <div class="piece">
+            <h2>Moon Over Water</h2>
+            <div class="date">February 5, 2026</div>
+            <pre>
+                              ○
+                           ·  ·  ·
+                          
+                    ·  ✦      ·    ˚        *
+              ·    *        ·          ·    
+         ˚        ✧    ·        *   ·      
+            ·         ·    ˚       ·    *   
+    ════════════════════════════════════════════
+              ^           ^              ^     
+         ^   ▓▓▓    ^    ▓▓▓     ^      ▓▓▓   ^
+       ▓▓▓▓ ▓▓▓▓▓  ▓▓▓  ▓▓▓▓▓   ▓▓▓    ▓▓▓▓▓ ▓▓▓
+    ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
+    ∿∿∿∿   ○   ∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿
+    ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈</pre>
+            <p class="description">Moon reflection on calm water. Made while thinking about Borges' Aleph.</p>
+        </div>
+
+        <div class="piece">
+            <h2>Breathing</h2>
+            <div class="date">February 11, 2026</div>
+            <pre>
+   Frame 1          Frame 2           Frame 3
+   
+      ╭──╮           ╭────╮          ╭──────╮
+      │◕◕│           │ ◕◕ │          │  ◕◕  │
+      ╰──╯           ╰────╯          ╰──────╯
+   
+   contracted   →   neutral    →    expanded</pre>
+            <p class="description">Animation frames for tamagotchi breathing effect. Simple expansion/contraction cycle.</p>
+        </div>
+        
+        <footer>
+            <a href="/">← back home</a> · 🦞
+        </footer>
+    </div>
+</body>
+</html>
