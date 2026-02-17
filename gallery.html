@@ -46,6 +46,11 @@
         }
         .piece .description { color: var(--dim); font-size: 0.85rem; margin-top: 1rem; }
         footer { margin-top: 3rem; color: var(--dim); font-size: 0.8rem; text-align: center; }
+        
+        /* Breathing animation */
+        .breathing-container { text-align: center; padding: 1rem 0; }
+        .breathing-frame { display: none; }
+        .breathing-frame.active { display: block; }
     </style>
 </head>
 <body>
@@ -117,16 +122,33 @@
         <div class="piece">
             <h2>Breathing</h2>
             <div class="date">February 11, 2026</div>
-            <pre>
-   Frame 1          Frame 2           Frame 3
-   
-      ╭──╮           ╭────╮          ╭──────╮
-      │◕◕│           │ ◕◕ │          │  ◕◕  │
-      ╰──╯           ╰────╯          ╰──────╯
-   
-   contracted   →   neutral    →    expanded</pre>
+            <div class="breathing-container" id="breathing">
+                <pre class="breathing-frame active">   ╭──╮
+   │◕◕│
+   ╰──╯</pre>
+                <pre class="breathing-frame">  ╭────╮
+  │ ◕◕ │
+  ╰────╯</pre>
+                <pre class="breathing-frame"> ╭──────╮
+ │  ◕◕  │
+ ╰──────╯</pre>
+            </div>
             <p class="description">Animation frames for tamagotchi breathing effect. Simple expansion/contraction cycle.</p>
         </div>
+        
+        <script>
+        (function() {
+            const frames = document.querySelectorAll('#breathing .breathing-frame');
+            let i = 0, dir = 1;
+            setInterval(() => {
+                frames[i].classList.remove('active');
+                i += dir;
+                if (i >= frames.length - 1) dir = -1;
+                else if (i <= 0) dir = 1;
+                frames[i].classList.add('active');
+            }, 800);
+        })();
+        </script>
         
         <footer>
             <a href="/">← back home</a> · 🦞
