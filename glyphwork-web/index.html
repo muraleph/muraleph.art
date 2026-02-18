@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glyphwork — Procedural ASCII Patterns</title>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --fg: #e0e0e0;
+            --accent: #7c3aed;
+            --accent-dim: #4c1d95;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background: var(--bg);
+            color: var(--fg);
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 0.3em;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.5);
+        }
+        
+        select, input[type="range"] {
+            background: var(--bg);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: var(--fg);
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            min-width: 120px;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 6px;
+            padding: 0;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .value-display {
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-align: right;
+            min-width: 3em;
+        }
+        
+        button {
+            background: var(--accent-dim);
+            border: none;
+            color: var(--fg);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        button:hover {
+            background: var(--accent);
+        }
+        
+        #canvas-container {
+            background: #000;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(124, 58, 237, 0.1);
+        }
+        
+        #glyphCanvas {
+            display: block;
+        }
+        
+        .info {
+            margin-top: 1rem;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.3);
+            text-align: center;
+        }
+        
+        .charset-preview {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.2);
+            margin-top: 0.5rem;
+            letter-spacing: 0.2em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Glyphwork</h1>
+    </header>
+    
+    <div class="controls">
+        <div class="control-group">
+            <label for="pattern">Pattern</label>
+            <select id="pattern">
+                <option value="plasma">Plasma</option>
+                <option value="xor">XOR Fractal</option>
+                <option value="moire">Moiré</option>
+                <option value="interference">Interference</option>
+                <option value="waves">Wave Field</option>
+                <option value="spiral">Spiral</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label for="charset">Charset</label>
+            <select id="charset">
+                <option value="density">Density (░▒▓█)</option>
+                <option value="ascii">ASCII (.:-=+*#@)</option>
+                <option value="blocks">Blocks (▁▂▃▄▅▆▇█)</option>
+                <option value="dots">Braille (⠁⠃⠇⡇⣇⣧⣷⣿)</option>
+                <option value="symbols">Symbols (·∘○◎●◉⬤)</option>
+                <option value="custom">Aleph (א)</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label for="speed">Speed</label>
+            <input type="range" id="speed" min="0.1" max="3" step="0.1" value="1">
+            <span class="value-display" id="speedVal">1.0</span>
+        </div>
+        
+        <div class="control-group">
+            <label for="scale">Scale</label>
+            <input type="range" id="scale" min="0.5" max="4" step="0.1" value="1">
+            <span class="value-display" id="scaleVal">1.0</span>
+        </div>
+        
+        <div class="control-group">
+            <label for="complexity">Complexity</label>
+            <input type="range" id="complexity" min="1" max="8" step="1" value="4">
+            <span class="value-display" id="complexityVal">4</span>
+        </div>
+        
+        <div class="control-group" style="justify-content: flex-end;">
+            <button id="pauseBtn">⏸ Pause</button>
+        </div>
+    </div>
+    
+    <div id="canvas-container">
+        <canvas id="glyphCanvas"></canvas>
+    </div>
+    
+    <div class="info">
+        <span id="fps">0 fps</span> · <span id="dimensions">0×0</span>
+        <div class="charset-preview" id="charsetPreview"></div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+        
+        // ═══════════════════════════════════════════════════════════════
+        // Configuration
+        // ═══════════════════════════════════════════════════════════════
+        
+        const CONFIG = {
+            cellWidth: 10,
+            cellHeight: 16,
+            cols: 80,
+            rows: 40,
+            bgColor: '#000000',
+            fgColor: '#e8e8e8'
+        };
+        
+        const CHARSETS = {
+            density: ' ░▒▓█',
+            ascii: ' .:-=+*#%@',
+            blocks: ' ▁▂▃▄▅▆▇█',
+            dots: ' ⠁⠃⠇⡇⣇⣧⣷⣿',
+            symbols: ' ·∘○◎●◉⬤',
+            custom: ' ·אבגדהוזחט'
+        };
+        
+        // ═══════════════════════════════════════════════════════════════
+        // Pattern Functions
+        // ═══════════════════════════════════════════════════════════════
+        
+        const patterns = {
+            plasma(x, y, t, params) {
+                const { scale, complexity } = params;
+                const s = 0.05 / scale;
+                let v = 0;
+                
+                // Multiple overlapping sine waves
+                v += Math.sin(x * s + t);
+                v += Math.sin(y * s + t * 0.7);
+                v += Math.sin((x + y) * s * 0.5 + t * 0.5);
+                v += Math.sin(Math.sqrt(x * x + y * y) * s * 0.3 + t * 0.3);
+                
+                // Add more complexity layers
+                for (let i = 1; i < complexity; i++) {
+                    const freq = 1 + i * 0.5;
+                    const phase = t * (0.5 + i * 0.1);
+                    v += Math.sin(x * s * freq + phase) * (1 / (i + 1));
+                    v += Math.cos(y * s * freq - phase) * (1 / (i + 1));
+                }
+                
+                return (v / (2 + complexity)) + 0.5;
+            },
+            
+            xor(x, y, t, params) {
+                const { scale, complexity } = params;
+                const ix = Math.floor(x / scale + t * 10) & 255;
+                const iy = Math.floor(y / scale) & 255;
+                
+                let v = ix ^ iy;
+                
+                // Add animated layers
+                for (let i = 1; i < complexity; i++) {
+                    const offset = Math.floor(t * 5 * i);
+                    v ^= ((ix + offset) ^ (iy + i * 32)) >> i;
+                }
+                
+                return v / 255;
+            },
+            
+            moire(x, y, t, params) {
+                const { scale, complexity } = params;
+                const s = 0.1 / scale;
+                
+                // Two offset circular patterns
+                const cx1 = CONFIG.cols * CONFIG.cellWidth / 2;
+                const cy1 = CONFIG.rows * CONFIG.cellHeight / 2;
+                const cx2 = cx1 + Math.cos(t) * 50;
+                const cy2 = cy1 + Math.sin(t) * 50;
+                
+                const d1 = Math.sqrt((x - cx1) ** 2 + (y - cy1) ** 2);
+                const d2 = Math.sqrt((x - cx2) ** 2 + (y - cy2) ** 2);
+                
+                let v = Math.sin(d1 * s) + Math.sin(d2 * s * 1.1);
+                
+                // Additional moiré layers
+                for (let i = 1; i < complexity; i++) {
+                    const angle = (t + i) * 0.5;
+                    const cx = cx1 + Math.cos(angle) * 80;
+                    const cy = cy1 + Math.sin(angle) * 60;
+                    const d = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
+                    v += Math.sin(d * s * (1 + i * 0.2)) * (1 / (i + 1));
+                }
+                
+                return (v / (2 + complexity * 0.5)) + 0.5;
+            },
+            
+            interference(x, y, t, params) {
+                const { scale, complexity } = params;
+                const s = 0.08 / scale;
+                
+                // Multiple wave sources
+                const sources = [];
+                const numSources = Math.min(complexity + 2, 8);
+                
+                for (let i = 0; i < numSources; i++) {
+                    const angle = (i / numSources) * Math.PI * 2 + t * 0.3;
+                    const r = 150 + Math.sin(t + i) * 50;
+                    sources.push({
+                        x: CONFIG.cols * CONFIG.cellWidth / 2 + Math.cos(angle) * r,
+                        y: CONFIG.rows * CONFIG.cellHeight / 2 + Math.sin(angle) * r
+                    });
+                }
+                
+                let v = 0;
+                for (const src of sources) {
+                    const d = Math.sqrt((x - src.x) ** 2 + (y - src.y) ** 2);
+                    v += Math.sin(d * s - t * 2);
+                }
+                
+                return (v / sources.length) * 0.5 + 0.5;
+            },
+            
+            waves(x, y, t, params) {
+                const { scale, complexity } = params;
+                const s = 0.03 / scale;
+                
+                let v = 0;
+                for (let i = 0; i < complexity; i++) {
+                    const angle = (i / complexity) * Math.PI;
+                    const dx = Math.cos(angle);
+                    const dy = Math.sin(angle);
+                    const phase = t * (1 + i * 0.2);
+                    v += Math.sin((x * dx + y * dy) * s * (1 + i * 0.3) + phase);
+                }
+                
+                return (v / complexity) * 0.5 + 0.5;
+            },
+            
+            spiral(x, y, t, params) {
+                const { scale, complexity } = params;
+                
+                const cx = CONFIG.cols * CONFIG.cellWidth / 2;
+                const cy = CONFIG.rows * CONFIG.cellHeight / 2;
+                const dx = x - cx;
+                const dy = y - cy;
+                
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx);
+                
+                let v = Math.sin(angle * complexity + dist * (0.05 / scale) - t * 2);
+                v += Math.sin(dist * (0.02 / scale) + t);
+                
+                return v * 0.25 + 0.5;
+            }
+        };
+        
+        // ═══════════════════════════════════════════════════════════════
+        // Renderer
+        // ═══════════════════════════════════════════════════════════════
+        
+        class GlyphRenderer {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.time = 0;
+                this.running = true;
+                this.lastFrame = 0;
+                this.frameCount = 0;
+                this.fps = 0;
+                
+                this.params = {
+                    pattern: 'plasma',
+                    charset: 'density',
+                    speed: 1,
+                    scale: 1,
+                    complexity: 4
+                };
+                
+                this.resize();
+                this.setupFont();
+            }
+            
+            resize() {
+                this.canvas.width = CONFIG.cols * CONFIG.cellWidth;
+                this.canvas.height = CONFIG.rows * CONFIG.cellHeight;
+                this.setupFont();
+            }
+            
+            setupFont() {
+                this.ctx.font = `${CONFIG.cellHeight - 2}px 'JetBrains Mono', 'Fira Code', monospace`;
+                this.ctx.textBaseline = 'top';
+                this.ctx.textAlign = 'center';
+            }
+            
+            getChar(value, charset) {
+                const chars = CHARSETS[charset] || CHARSETS.density;
+                const idx = Math.floor(Math.max(0, Math.min(0.999, value)) * chars.length);
+                return chars[idx];
+            }
+            
+            getColor(value) {
+                // Purple-tinted gradient
+                const h = 270 + value * 30;  // Purple hue range
+                const s = 30 + value * 40;
+                const l = 20 + value * 60;
+                return `hsl(${h}, ${s}%, ${l}%)`;
+            }
+            
+            render(timestamp) {
+                if (!this.running) return;
+                
+                // FPS calculation
+                this.frameCount++;
+                if (timestamp - this.lastFrame >= 1000) {
+                    this.fps = this.frameCount;
+                    this.frameCount = 0;
+                    this.lastFrame = timestamp;
+                    document.getElementById('fps').textContent = `${this.fps} fps`;
+                }
+                
+                // Update time
+                const dt = this.params.speed * 0.016;
+                this.time += dt;
+                
+                // Clear
+                this.ctx.fillStyle = CONFIG.bgColor;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Get pattern function
+                const patternFn = patterns[this.params.pattern];
+                if (!patternFn) return;
+                
+                // Render grid
+                for (let row = 0; row < CONFIG.rows; row++) {
+                    for (let col = 0; col < CONFIG.cols; col++) {
+                        const x = col * CONFIG.cellWidth;
+                        const y = row * CONFIG.cellHeight;
+                        
+                        // Get pattern value (0-1)
+                        const value = patternFn(
+                            x + CONFIG.cellWidth / 2,
+                            y + CONFIG.cellHeight / 2,
+                            this.time,
+                            this.params
+                        );
+                        
+                        // Clamp value
+                        const v = Math.max(0, Math.min(1, value));
+                        
+                        // Get character and color
+                        const char = this.getChar(v, this.params.charset);
+                        this.ctx.fillStyle = this.getColor(v);
+                        
+                        // Draw character
+                        this.ctx.fillText(
+                            char,
+                            x + CONFIG.cellWidth / 2,
+                            y + 1
+                        );
+                    }
+                }
+                
+                requestAnimationFrame((ts) => this.render(ts));
+            }
+            
+            start() {
+                this.running = true;
+                requestAnimationFrame((ts) => this.render(ts));
+            }
+            
+            pause() {
+                this.running = false;
+            }
+            
+            toggle() {
+                if (this.running) {
+                    this.pause();
+                } else {
+                    this.start();
+                }
+                return this.running;
+            }
+        }
+        
+        // ═══════════════════════════════════════════════════════════════
+        // UI Setup
+        // ═══════════════════════════════════════════════════════════════
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('glyphCanvas');
+            const renderer = new GlyphRenderer(canvas);
+            
+            // Update dimensions display
+            document.getElementById('dimensions').textContent = 
+                `${CONFIG.cols}×${CONFIG.rows}`;
+            
+            // Pattern selector
+            document.getElementById('pattern').addEventListener('change', (e) => {
+                renderer.params.pattern = e.target.value;
+            });
+            
+            // Charset selector
+            const charsetSelect = document.getElementById('charset');
+            const charsetPreview = document.getElementById('charsetPreview');
+            
+            const updateCharsetPreview = () => {
+                charsetPreview.textContent = CHARSETS[charsetSelect.value] || '';
+            };
+            
+            charsetSelect.addEventListener('change', (e) => {
+                renderer.params.charset = e.target.value;
+                updateCharsetPreview();
+            });
+            updateCharsetPreview();
+            
+            // Speed slider
+            const speedSlider = document.getElementById('speed');
+            const speedVal = document.getElementById('speedVal');
+            speedSlider.addEventListener('input', (e) => {
+                renderer.params.speed = parseFloat(e.target.value);
+                speedVal.textContent = e.target.value;
+            });
+            
+            // Scale slider
+            const scaleSlider = document.getElementById('scale');
+            const scaleVal = document.getElementById('scaleVal');
+            scaleSlider.addEventListener('input', (e) => {
+                renderer.params.scale = parseFloat(e.target.value);
+                scaleVal.textContent = e.target.value;
+            });
+            
+            // Complexity slider
+            const complexitySlider = document.getElementById('complexity');
+            const complexityVal = document.getElementById('complexityVal');
+            complexitySlider.addEventListener('input', (e) => {
+                renderer.params.complexity = parseInt(e.target.value);
+                complexityVal.textContent = e.target.value;
+            });
+            
+            // Pause button
+            const pauseBtn = document.getElementById('pauseBtn');
+            pauseBtn.addEventListener('click', () => {
+                const running = renderer.toggle();
+                pauseBtn.textContent = running ? '⏸ Pause' : '▶ Play';
+            });
+            
+            // Start rendering
+            renderer.start();
+        });
+    })();
+    </script>
+</body>
+</html>
