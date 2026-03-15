@@ -192,6 +192,25 @@
             margin-top: 0.5rem;
             letter-spacing: 0.2em;
         }
+        
+        #shareBtn {
+            background: #1d4ed8;
+        }
+        
+        #shareBtn:hover {
+            background: #2563eb;
+        }
+        
+        .share-status {
+            font-size: 0.75rem;
+            color: #22c55e;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .share-status.visible {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -250,6 +269,11 @@
             <button id="recordBtn">⏺ Record GIF</button>
             <button id="stopBtn">⏹ Stop</button>
             <span id="gifProgress" class="gif-progress hidden">0.0s</span>
+        </div>
+        
+        <div class="control-group" style="justify-content: flex-end;">
+            <button id="shareBtn">🔗 Copy Link</button>
+            <span id="shareStatus" class="share-status"></span>
         </div>
     </div>
     
@@ -550,6 +574,88 @@
         }
         
         // ═══════════════════════════════════════════════════════════════
+        // URL Parameter Handling
+        // ═══════════════════════════════════════════════════════════════
+        
+        const URLParams = {
+            // Valid parameter definitions with constraints
+            definitions: {
+                pattern: {
+                    valid: ['plasma', 'xor', 'moire', 'interference', 'waves', 'spiral'],
+                    default: 'plasma'
+                },
+                charset: {
+                    valid: ['density', 'ascii', 'blocks', 'dots', 'symbols', 'custom'],
+                    default: 'density'
+                },
+                speed: {
+                    min: 0.1, max: 3, step: 0.1, default: 1
+                },
+                scale: {
+                    min: 0.5, max: 4, step: 0.1, default: 1
+                },
+                complexity: {
+                    min: 1, max: 8, step: 1, default: 4
+                }
+            },
+            
+            // Parse URL and return validated params
+            parse() {
+                const params = new URLSearchParams(window.location.search);
+                const result = {};
+                
+                for (const [key, def] of Object.entries(this.definitions)) {
+                    const value = params.get(key);
+                    if (value === null) continue;
+                    
+                    if (def.valid) {
+                        // Enum type (pattern, charset)
+                        if (def.valid.includes(value)) {
+                            result[key] = value;
+                        }
+                    } else {
+                        // Numeric type (speed, scale, complexity)
+                        const num = parseFloat(value);
+                        if (!isNaN(num) && num >= def.min && num <= def.max) {
+                            // Round to step
+                            result[key] = Math.round(num / def.step) * def.step;
+                        }
+                    }
+                }
+                
+                return result;
+            },
+            
+            // Generate URL with current params
+            generate(params) {
+                const url = new URL(window.location.href.split('?')[0]);
+                
+                // Only add non-default params
+                for (const [key, def] of Object.entries(this.definitions)) {
+                    const value = params[key];
+                    const defaultVal = def.default;
+                    
+                    if (value !== undefined && value !== defaultVal) {
+                        // Round numeric values for cleaner URLs
+                        if (typeof value === 'number') {
+                            url.searchParams.set(key, Number(value.toFixed(1)));
+                        } else {
+                            url.searchParams.set(key, value);
+                        }
+                    }
+                }
+                
+                return url.toString();
+            },
+            
+            // Update browser URL without reload (for bookmarking)
+            updateBrowser(params) {
+                const url = this.generate(params);
+                window.history.replaceState({}, '', url);
+            }
+        };
+        
+        // ═══════════════════════════════════════════════════════════════
         // UI Setup
         // ═══════════════════════════════════════════════════════════════
         
@@ -557,18 +663,39 @@
             const canvas = document.getElementById('glyphCanvas');
             const renderer = new GlyphRenderer(canvas);
             
+            // Parse URL params and apply them
+            const urlParams = URLParams.parse();
+            Object.assign(renderer.params, urlParams);
+            
             // Update dimensions display
             document.getElementById('dimensions').textContent = 
                 `${CONFIG.cols}×${CONFIG.rows}`;
             
+            // ═══════════════════════════════════════════════════════════════
+            // Helper to update URL when params change
+            // ═══════════════════════════════════════════════════════════════
+            
+            const syncURL = () => URLParams.updateBrowser(renderer.params);
+            
+            // ═══════════════════════════════════════════════════════════════
             // Pattern selector
-            document.getElementById('pattern').addEventListener('change', (e) => {
+            // ═══════════════════════════════════════════════════════════════
+            
+            const patternSelect = document.getElementById('pattern');
+            patternSelect.value = renderer.params.pattern;
+            patternSelect.addEventListener('change', (e) => {
                 renderer.params.pattern = e.target.value;
+                syncURL();
             });
             
+            // ═══════════════════════════════════════════════════════════════
             // Charset selector
+            // ═══════════════════════════════════════════════════════════════
+            
             const charsetSelect = document.getElementById('charset');
             const charsetPreview = document.getElementById('charsetPreview');
+            
+            charsetSelect.value = renderer.params.charset;
             
             const updateCharsetPreview = () => {
                 charsetPreview.textContent = CHARSETS[charsetSelect.value] || '';
@@ -577,31 +704,83 @@
             charsetSelect.addEventListener('change', (e) => {
                 renderer.params.charset = e.target.value;
                 updateCharsetPreview();
+                syncURL();
             });
             updateCharsetPreview();
             
+            // ═══════════════════════════════════════════════════════════════
             // Speed slider
+            // ═══════════════════════════════════════════════════════════════
+            
             const speedSlider = document.getElementById('speed');
             const speedVal = document.getElementById('speedVal');
+            speedSlider.value = renderer.params.speed;
+            speedVal.textContent = renderer.params.speed.toFixed(1);
+            
             speedSlider.addEventListener('input', (e) => {
                 renderer.params.speed = parseFloat(e.target.value);
                 speedVal.textContent = e.target.value;
             });
+            speedSlider.addEventListener('change', syncURL);
             
+            // ═══════════════════════════════════════════════════════════════
             // Scale slider
+            // ═══════════════════════════════════════════════════════════════
+            
             const scaleSlider = document.getElementById('scale');
             const scaleVal = document.getElementById('scaleVal');
+            scaleSlider.value = renderer.params.scale;
+            scaleVal.textContent = renderer.params.scale.toFixed(1);
+            
             scaleSlider.addEventListener('input', (e) => {
                 renderer.params.scale = parseFloat(e.target.value);
                 scaleVal.textContent = e.target.value;
             });
+            scaleSlider.addEventListener('change', syncURL);
             
+            // ═══════════════════════════════════════════════════════════════
             // Complexity slider
+            // ═══════════════════════════════════════════════════════════════
+            
             const complexitySlider = document.getElementById('complexity');
             const complexityVal = document.getElementById('complexityVal');
+            complexitySlider.value = renderer.params.complexity;
+            complexityVal.textContent = renderer.params.complexity;
+            
             complexitySlider.addEventListener('input', (e) => {
                 renderer.params.complexity = parseInt(e.target.value);
                 complexityVal.textContent = e.target.value;
+            });
+            complexitySlider.addEventListener('change', syncURL);
+            
+            // ═══════════════════════════════════════════════════════════════
+            // Share button
+            // ═══════════════════════════════════════════════════════════════
+            
+            const shareBtn = document.getElementById('shareBtn');
+            const shareStatus = document.getElementById('shareStatus');
+            
+            shareBtn.addEventListener('click', async () => {
+                const url = URLParams.generate(renderer.params);
+                
+                try {
+                    await navigator.clipboard.writeText(url);
+                    shareStatus.textContent = '✓ Copied!';
+                    shareStatus.classList.add('visible');
+                    setTimeout(() => shareStatus.classList.remove('visible'), 2000);
+                } catch (err) {
+                    // Fallback for older browsers
+                    const input = document.createElement('input');
+                    input.value = url;
+                    document.body.appendChild(input);
+                    input.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(input);
+                    
+                    shareStatus.textContent = '✓ Copied!';
+                    shareStatus.classList.add('visible');
+                    setTimeout(() => shareStatus.classList.remove('visible'), 2000);
+                }
             });
             
             // Pause button
